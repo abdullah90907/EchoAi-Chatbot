@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+
+{% block title %}EchoAI - Home{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center min-vh-100">
+            <div class="col-lg-6">
+                <div class="hero-content">
+                    <h1 class="display-4 fw-bold mb-4">
+                        Welcome to <span class="text-gradient">EchoAI</span>
+                    </h1>
+                    <p class="lead mb-4">
+                        Your AI-powered content creation and analysis platform. Generate engaging social media content, 
+                        analyze text sentiment, and chat with our intelligent assistant.
+                    </p>
+                    <div class="hero-buttons">
+                        <a href="{{ url_for('main.content_generator') }}" class="btn btn-primary btn-lg me-3">
+                            <i class="fas fa-edit me-2"></i>Start Creating
+                        </a>
+                        <a href="#features" class="btn btn-outline-primary btn-lg">
+                            <i class="fas fa-info-circle me-2"></i>Learn More
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="hero-image text-center">
+                    <div class="floating-card">
+                        <i class="fas fa-robot fa-5x ai-powered-icon mb-3"></i>
+                        <h4>AI-Powered</h4>
+                        <p>Advanced language models at your service</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section id="features" class="features-section">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-lg-8 mx-auto">
+                <h2 class="display-5 fw-bold mb-3 features-title">Powerful AI Features</h2>
+                <p class="lead text-muted">
+                    Discover the amazing capabilities of EchoAI to boost your productivity and creativity.
+                </p>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <!-- Content Generator -->
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card h-100">
+                    <div class="feature-icon">
+                        <i class="fas fa-edit"></i>
+                    </div>
+                    <h4>Content Generator</h4>
+                    <p>Create engaging social media content for Instagram, LinkedIn, and Facebook with AI assistance.</p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check text-success me-2"></i>Multiple platform support</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Brand voice customization</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Length optimization</li>
+                    </ul>
+                    <a href="{{ url_for('main.content_generator') }}" class="btn btn-primary">
+                        Try It Now <i class="fas fa-arrow-right ms-2"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Text Analyzer -->
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card h-100">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h4>Text Analyzer</h4>
+                    <p>Analyze text sentiment, extract keywords, and generate summaries with advanced AI algorithms.</p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check text-success me-2"></i>Sentiment analysis</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Keyword extraction</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Text summarization</li>
+                    </ul>
+                    <a href="{{ url_for('main.text_analyzer') }}" class="btn btn-primary">
+                        Analyze Now <i class="fas fa-arrow-right ms-2"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Chat Assistant -->
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card h-100">
+                    <div class="feature-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <h4>Chat Assistant</h4>
+                    <p>Have intelligent conversations with our AI assistant for questions, brainstorming, and creative tasks.</p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check text-success me-2"></i>Natural conversation</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Creative assistance</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Real-time responses</li>
+                    </ul>
+                    <a href="{{ url_for('main.chat_assistant') }}" class="btn btn-primary">
+                        Start Chat <i class="fas fa-arrow-right ms-2"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="stats-section">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="stat-item">
+                    <i class="fas fa-users fa-3x mb-3 stat-icon"></i>
+                    <h3 class="fw-bold">10K+</h3>
+                    <p>Active Users</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="stat-item">
+                    <i class="fas fa-file-alt fa-3x mb-3 stat-icon"></i>
+                    <h3 class="fw-bold">100K+</h3>
+                    <p>Content Generated</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="stat-item">
+                    <i class="fas fa-clock fa-3x mb-3 stat-icon"></i>
+                    <h3 class="fw-bold">24/7</h3>
+                    <p>AI Availability</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="stat-item">
+                    <i class="fas fa-star fa-3x mb-3 stat-icon"></i>
+                    <h3 class="fw-bold">4.9/5</h3>
+                    <p>User Rating</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-lg-8 mx-auto">
+                <h2 class="display-5 fw-bold mb-3">Ready to Get Started?</h2>
+                <p class="lead mb-4">
+                    Join thousands of users who are already creating amazing content with EchoAI.
+                </p>
+                <a href="{{ url_for('main.content_generator') }}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-rocket me-2"></i>Start Creating Now
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Smooth scrolling for anchor links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        document.querySelector(this.getAttribute('href')).scrollIntoView({
+            behavior: 'smooth'
+        });
+    });
+});
+
+// Add animation on scroll
+window.addEventListener('scroll', () => {
+    const features = document.querySelectorAll('.feature-card');
+    features.forEach(feature => {
+        const featureTop = feature.getBoundingClientRect().top;
+        const windowHeight = window.innerHeight;
+        
+        if (featureTop < windowHeight - 100) {
+            feature.classList.add('animate-in');
+        }
+    });
+});
+</script>
+{% endblock %}

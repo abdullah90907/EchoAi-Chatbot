@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+
+{% block title %}Content Generator - EchoAI{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="text-center mb-5">
+                <div class="feature-icon mx-auto mb-4" style="width: 100px; height: 100px;">
+                    <i class="fas fa-edit"></i>
+                </div>
+                <h1 class="display-5 fw-bold mb-3">
+                    <span class="text-gradient">AI Content Generator</span>
+                </h1>
+                <p class="lead text-muted">
+                    Create engaging social media content with the power of AI
+                </p>
+            </div>
+            
+            <!-- Content Generator Form -->
+            <div class="card shadow-lg border-0">
+                <div class="card-body p-4">
+                    <form id="contentForm">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="contentType" class="form-label fw-bold">Content Type</label>
+                                <select class="form-select" id="contentType" name="content_type">
+                                    <option value="Instagram Caption">Instagram Caption</option>
+                                    <option value="LinkedIn Post">LinkedIn Post</option>
+                                    <option value="Facebook Post">Facebook Post</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="brandVoice" class="form-label fw-bold">Brand Voice</label>
+                                <select class="form-select" id="brandVoice" name="brand_voice">
+                                    <option value="Professional">Professional</option>
+                                    <option value="Casual">Casual</option>
+                                    <option value="Witty">Witty</option>
+                                    <option value="Inspirational">Inspirational</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="maxLength" class="form-label fw-bold">Max Length: <span id="lengthValue">150</span> characters</label>
+                            <input type="range" class="form-range" id="maxLength" name="max_length" min="50" max="300" value="150">
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="prompt" class="form-label fw-bold">Content Prompt</label>
+                            <textarea class="form-control" id="prompt" name="prompt" rows="4" 
+                                placeholder="Enter your content idea... (e.g., 'Promote our new eco-friendly product launch')"></textarea>
+                        </div>
+                        
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary btn-lg px-5">
+                                <i class="fas fa-magic me-2"></i>Generate Content
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Loading Animation -->
+            <div id="loadingDiv" class="text-center my-4" style="display: none;">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2 text-muted">Generating amazing content...</p>
+            </div>
+            
+            <!-- Results -->
+            <div id="resultsDiv" class="card shadow-lg border-0 mt-4" style="display: none;">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-check-circle me-2"></i>Generated Content</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <small class="text-muted">Content Type:</small>
+                                <p class="fw-bold mb-0" id="resultContentType"></p>
+                            </div>
+                            <div class="col-md-6">
+                                <small class="text-muted">Brand Voice:</small>
+                                <p class="fw-bold mb-0" id="resultBrandVoice"></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-output p-3 bg-light rounded">
+                        <p id="generatedContent" class="mb-0"></p>
+                    </div>
+                    <div class="mt-3 text-end">
+                        <button class="btn btn-outline-primary btn-sm" onclick="copyToClipboard()">
+                            <i class="fas fa-copy me-1"></i>Copy to Clipboard
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm ms-2" onclick="shareContent()">
+                            <i class="fas fa-share me-1"></i>Share
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Error Alert -->
+            <div id="errorAlert" class="alert alert-danger mt-4" style="display: none;">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <span id="errorMessage"></span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Update length value display
+document.getElementById('maxLength').addEventListener('input', function() {
+    document.getElementById('lengthValue').textContent = this.value;
+});
+
+// Form submission
+document.getElementById('contentForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const prompt = document.getElementById('prompt').value.trim();
+    if (!prompt) {
+        showError('Please enter a content prompt');
+        return;
+    }
+    
+    const formData = {
+        prompt: prompt,
+        content_type: document.getElementById('contentType').value,
+        brand_voice: document.getElementById('brandVoice').value,
+        max_length: parseInt(document.getElementById('maxLength').value)
+    };
+    
+    // Show loading
+    document.getElementById('loadingDiv').style.display = 'block';
+    document.getElementById('resultsDiv').style.display = 'none';
+    document.getElementById('errorAlert').style.display = 'none';
+    
+    try {
+        const response = await fetch('/api/generate-content', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Show results
+            document.getElementById('generatedContent').textContent = data.content;
+            document.getElementById('resultContentType').textContent = data.content_type;
+            document.getElementById('resultBrandVoice').textContent = data.brand_voice;
+            document.getElementById('resultsDiv').style.display = 'block';
+        } else {
+            showError(data.error || 'Failed to generate content');
+        }
+    } catch (error) {
+        showError('Network error. Please try again.');
+    } finally {
+        document.getElementById('loadingDiv').style.display = 'none';
+    }
+});
+
+function showError(message) {
+    document.getElementById('errorMessage').textContent = message;
+    document.getElementById('errorAlert').style.display = 'block';
+}
+
+function copyToClipboard() {
+    const content = document.getElementById('generatedContent').textContent;
+    navigator.clipboard.writeText(content).then(() => {
+        // Show success toast
+        const toast = document.createElement('div');
+        toast.className = 'toast align-items-center text-white bg-success border-0 position-fixed';
+        toast.style.cssText = 'top: 20px; right: 20px; z-index: 1000;';
+        toast.innerHTML = `
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="fas fa-check me-2"></i>Content copied to clipboard!
+                </div>
+            </div>
+        `;
+        document.body.appendChild(toast);
+        setTimeout(() => document.body.removeChild(toast), 3000);
+    });
+}
+
+function shareContent() {
+    const content = document.getElementById('generatedContent').textContent;
+    if (navigator.share) {
+        navigator.share({
+            title: 'Generated Content from EchoAI',
+            text: content
+        });
+    } else {
+        copyToClipboard();
+    }
+}
+</script>
+{% endblock %}

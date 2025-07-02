@@ -1,0 +1,245 @@
+{% extends "base.html" %}
+
+{% block title %}Text Analyzer - EchoAI{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="text-center mb-5">
+                <div class="feature-icon mx-auto mb-4" style="width: 100px; height: 100px;">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h1 class="display-5 fw-bold mb-3">
+                    <span class="text-gradient">AI Text Analyzer</span>
+                </h1>
+                <p class="lead text-muted">
+                    Analyze sentiment, extract keywords, and summarize text with AI
+                </p>
+            </div>
+            
+            <!-- Text Analyzer Form -->
+            <div class="card shadow-lg border-0">
+                <div class="card-body p-4">
+                    <form id="analyzerForm">
+                        <div class="mb-3">
+                            <label for="analysisType" class="form-label fw-bold">Analysis Type</label>
+                            <select class="form-select" id="analysisType" name="analysis_type">
+                                <option value="sentiment">Sentiment Analysis</option>
+                                <option value="summary">Text Summary</option>
+                                <option value="keywords">Keyword Extraction</option>
+                                <option value="general">General Analysis</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="textInput" class="form-label fw-bold">Text to Analyze</label>
+                            <textarea class="form-control" id="textInput" name="text" rows="6" 
+                                placeholder="Paste or type your text here for analysis..."></textarea>
+                            <div class="form-text">
+                                <span id="charCount">0</span> characters
+                            </div>
+                        </div>
+                        
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary btn-lg px-5">
+                                <i class="fas fa-search me-2"></i>Analyze Text
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Loading Animation -->
+            <div id="loadingDiv" class="text-center my-4" style="display: none;">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2 text-muted">Analyzing your text...</p>
+            </div>
+            
+            <!-- Results -->
+            <div id="resultsDiv" class="card shadow-lg border-0 mt-4" style="display: none;">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Analysis Results</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <small class="text-muted">Analysis Type:</small>
+                        <p class="fw-bold mb-0" id="resultAnalysisType"></p>
+                    </div>
+                    <div class="analysis-output p-3 bg-light rounded">
+                        <div id="analysisResult"></div>
+                    </div>
+                    <div class="mt-3 text-end">
+                        <button class="btn btn-outline-primary btn-sm" onclick="copyAnalysis()">
+                            <i class="fas fa-copy me-1"></i>Copy Results
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm ms-2" onclick="exportAnalysis()">
+                            <i class="fas fa-download me-1"></i>Export
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Error Alert -->
+            <div id="errorAlert" class="alert alert-danger mt-4" style="display: none;">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <span id="errorMessage"></span>
+            </div>
+            
+            <!-- Sample Texts -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-lightbulb me-2"></i>Try These Sample Texts</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <button class="btn btn-outline-secondary btn-sm w-100 mb-2" onclick="loadSample(1)">
+                                Product Review
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            <button class="btn btn-outline-secondary btn-sm w-100 mb-2" onclick="loadSample(2)">
+                                News Article
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            <button class="btn btn-outline-secondary btn-sm w-100 mb-2" onclick="loadSample(3)">
+                                Social Media Post
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Character counter
+document.getElementById('textInput').addEventListener('input', function() {
+    document.getElementById('charCount').textContent = this.value.length;
+});
+
+// Sample texts
+const samples = {
+    1: "I absolutely love this new smartphone! The camera quality is outstanding, and the battery life exceeds my expectations. The design is sleek and modern. However, I wish it had more storage options. Overall, it's definitely worth the investment and I would recommend it to anyone looking for a reliable device.",
+    2: "In a groundbreaking study published today, researchers have discovered a new method for renewable energy storage that could revolutionize the industry. The technology promises to increase efficiency by 40% while reducing costs significantly. This development comes at a crucial time as governments worldwide are pushing for cleaner energy solutions.",
+    3: "Just had the most amazing coffee at the new cafe downtown! ☕️ The atmosphere is cozy and perfect for working. The barista was super friendly and made some incredible latte art. Can't wait to go back! #coffee #local #caffelife"
+};
+
+function loadSample(num) {
+    document.getElementById('textInput').value = samples[num];
+    document.getElementById('charCount').textContent = samples[num].length;
+}
+
+// Form submission
+document.getElementById('analyzerForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const text = document.getElementById('textInput').value.trim();
+    if (!text) {
+        showError('Please enter text to analyze');
+        return;
+    }
+    
+    const formData = {
+        text: text,
+        analysis_type: document.getElementById('analysisType').value
+    };
+    
+    // Show loading
+    document.getElementById('loadingDiv').style.display = 'block';
+    document.getElementById('resultsDiv').style.display = 'none';
+    document.getElementById('errorAlert').style.display = 'none';
+    
+    try {
+        const response = await fetch('/api/analyze-text', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Show results
+            document.getElementById('analysisResult').innerHTML = formatAnalysisResult(data.analysis);
+            document.getElementById('resultAnalysisType').textContent = formatAnalysisType(data.analysis_type);
+            document.getElementById('resultsDiv').style.display = 'block';
+        } else {
+            showError(data.error || 'Failed to analyze text');
+        }
+    } catch (error) {
+        showError('Network error. Please try again.');
+    } finally {
+        document.getElementById('loadingDiv').style.display = 'none';
+    }
+});
+
+function formatAnalysisType(type) {
+    const types = {
+        'sentiment': 'Sentiment Analysis',
+        'summary': 'Text Summary',
+        'keywords': 'Keyword Extraction',
+        'general': 'General Analysis'
+    };
+    return types[type] || type;
+}
+
+function formatAnalysisResult(result) {
+    // Simple formatting - convert line breaks to HTML
+    return result.replace(/\n/g, '<br>');
+}
+
+function showError(message) {
+    document.getElementById('errorMessage').textContent = message;
+    document.getElementById('errorAlert').style.display = 'block';
+}
+
+function copyAnalysis() {
+    const content = document.getElementById('analysisResult').textContent;
+    navigator.clipboard.writeText(content).then(() => {
+        showToast('Analysis copied to clipboard!', 'success');
+    });
+}
+
+function exportAnalysis() {
+    const content = document.getElementById('analysisResult').textContent;
+    const type = document.getElementById('resultAnalysisType').textContent;
+    
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `echoai_${type.toLowerCase().replace(' ', '_')}_analysis.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+    
+    showToast('Analysis exported successfully!', 'success');
+}
+
+function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.className = `toast align-items-center text-white bg-${type} border-0 position-fixed`;
+    toast.style.cssText = 'top: 20px; right: 20px; z-index: 1000;';
+    toast.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="fas fa-check me-2"></i>${message}
+            </div>
+        </div>
+    `;
+    document.body.appendChild(toast);
+    setTimeout(() => document.body.removeChild(toast), 3000);
+}
+</script>
+{% endblock %}
